@@ -8,7 +8,7 @@ StatCounter lets you download the visits in a CSV file. Each visit has ~ 20 fiel
 
 Some database clients already let you import CSV files, but I noticed that they don't do it perfectly (I'm looking at you, PHPMyAdmin). If a field contains a double quote, StatCounter escapes it by doubling it (converts it into double-double quote), and some database clients get thrown off by that. So I decided to write my own program for import, especially since I also want to do some processing of the fields before putting them in the database.
 
-This program uses what I like to think of as plugins for various ways to extract the fields. So far I've written only one such plugin, called <code>extractQuoteEnclosedDoubleQuoteEscapedFields</code>. It assumes that the fields in the CSV file are enclosed in quotes and separated by commas; quotes inside the fields are also escaped by quotes, in other words, they are double-double quotes. That's the StatCounter format. If you have a CSV file where files are enclosed, separated, or escaped differently, you will need to write your own plugin.
+This program uses what I like to think of as plugins for various ways to extract the fields. So far I've written only one such plugin, called extractQuoteEnclosedDoubleQuoteEscapedFields. It assumes that the fields in the CSV file are enclosed in quotes and separated by commas; quotes inside the fields are also escaped by quotes, in other words, they are double-double quotes. That's the StatCounter format. If you have a CSV file where files are enclosed, separated, or escaped differently, you will need to write your own plugin.
 
 To import the rows from a file into a database, we need to know the following things:
 
@@ -26,31 +26,31 @@ Both the table name and the header file name, along with more advanced configura
   </appSettings>
 </configuration>
 
-For basic import, that's all you need. You will pass the import file name on the command line. In Windows command line, <code>cd</code> into the directory where your executable is, and run this:
+For basic import, that's all you need. You will pass the import file name on the command line. In Windows command line, cd into the directory where your executable is, and run this:
 
-<code>DBImport <import_file_path></code>
+DBImport <import_file_path>
 
 e.g.
 
-<code>DBImport "C:\Users\your_username\Documents\Visual Studio 2010\Projects\DBImport\DBImport\StatCounter-Log-20121228.csv"</code>
+DBImport "C:\Users\your_username\Documents\Visual Studio 2010\Projects\DBImport\DBImport\StatCounter-Log-20121228.csv"
 
 But there are more advanced options for import you could use if you like. Specifically, you can tell the program to process certain fields.
 
 Many times a referrer URL is some ungodly string of several hundred characters. It's ugly and very unreadable, since it's full of seemingly random characters. In the middle of it there may be a nugget of information that gives you a hint what the visitor to your website was actually loooking for. This is especially true if they come to your website from image search, as is the case with most visitors to my website. Such a referring URL might look like this:
 
-<code>www.google.de/imgres?um=1&hl=de&sa=N&tbo=d&biw=1707&bih=663&tbm=isch&tbnid=nNgVi8wMS0QPGM:&imgrefurl=http://pic.geekitude.com/v/CFI/sfn_halloween2008/P1020920GirlAndBoyStompOnBalloon.jpg.html&docid=rUrJ8NobSH_33M&imgurl=http://pic.geekitude.com/d/6444-2/P1020920GirlAndBoyStompOnBalloon.jpg&w=800&h=753&ei=2ETfUKrJCMLRhAeojYHwBQ&zoom=1&iact=hc&vpx=2&vpy=2&dur=1688&hovh=218&hovw=231&tx=144&ty=153&sig=103665961324907566570&page=1&tbnh=147&tbnw=153&start=0&ndsp=19&ved=1t:429,r:12,s:0,i:124</code>
+www.google.de/imgres?um=1&hl=de&sa=N&tbo=d&biw=1707&bih=663&tbm=isch&tbnid=nNgVi8wMS0QPGM:&imgrefurl=http://pic.geekitude.com/v/CFI/sfn_halloween2008/P1020920GirlAndBoyStompOnBalloon.jpg.html&docid=rUrJ8NobSH_33M&imgurl=http://pic.geekitude.com/d/6444-2/P1020920GirlAndBoyStompOnBalloon.jpg&w=800&h=753&ei=2ETfUKrJCMLRhAeojYHwBQ&zoom=1&iact=hc&vpx=2&vpy=2&dur=1688&hovh=218&hovw=231&tx=144&ty=153&sig=103665961324907566570&page=1&tbnh=147&tbnw=153&start=0&ndsp=19&ved=1t:429,r:12,s:0,i:124
 
-In all this garble of characters, the only thing of interest to me is <code>P1020920GirlAndBoyStompOnBalloon.jpg</code>, because that's the image that brought the visitor to my website. 
+In all this garble of characters, the only thing of interest to me is P1020920GirlAndBoyStompOnBalloon.jpg, because that's the image that brought the visitor to my website. 
 
-The whole purpose of importing the logs into my own database is so that I could later view them in my own web application, and maybe manipulate them -- group them, sort them, label the interesting ones, delete the non-interesting ones. (This web application is a separate project from DBImport.) When I look at this web application, I want to see at a glance what brought each visitor to my website. So instead of the string like the above, I want to see just <code>P1020920GirlAndBoyStompOnBalloon.jpg</code>. If they came via a search query, I want to see the search terms. During import I might want to extract this important information from the referrer field, and store it in a separate field.
+The whole purpose of importing the logs into my own database is so that I could later view them in my own web application, and maybe manipulate them -- group them, sort them, label the interesting ones, delete the non-interesting ones. (This web application is a separate project from DBImport.) When I look at this web application, I want to see at a glance what brought each visitor to my website. So instead of the string like the above, I want to see just P1020920GirlAndBoyStompOnBalloon.jpg. If they came via a search query, I want to see the search terms. During import I might want to extract this important information from the referrer field, and store it in a separate field.
 
-For this I wrote a method called <code>compactifyReferringURL</code>, and put it in the <code>PluginManager.cs</code> class. You can write your own method to do any kind of transformation on any field you want. To cause that method to be invoked, specify it in the app.config like this:
+For this I wrote a method called compactifyReferringURL, and put it in the PluginManager.cs class. You can write your own method to do any kind of transformation on any field you want. To cause that method to be invoked, specify it in the app.config like this:
 
     <add key="transform_method.came_from" value="PluginManager.compactifyReferringURL" />
 
-Here, the method name, <code>PluginManager.compactifyReferringURL</code> is the value of the key whose name is <code>transform_method.came_from</code>. "<code>came_from</code>" is the name of a Statcounter field that contains referring URL. If you want to transform another field, say, <code>page_url</code>, your key would be named <code>transform_method.page_url</code>. The "<code>transform_method</code>" prefix is required for indicating that this setting will contain a transformation method name for a particular field.
+Here, the method name, PluginManager.compactifyReferringURL is the value of the key whose name is transform_method.came_from. "came_from" is the name of a Statcounter field that contains referring URL. If you want to transform another field, say, page_url, your key would be named transform_method.page_url. The "transform_method" prefix is required for indicating that this setting will contain a transformation method name for a particular field.
 
-<code>compactifyReferringURL</code> extracts a lot of useful information, such as 
+compactifyReferringURL extracts a lot of useful information, such as 
 
 (1) search terms;
 
@@ -58,23 +58,23 @@ Here, the method name, <code>PluginManager.compactifyReferringURL</code> is the 
 
 So, for example, a referrer string like this
 
-<code>http://images.ask.com/fr?q=people dress up anime&desturi=http%3A%2F%2Fgallery.geekitude.com%2Fv%2Fsf%2Flinucon2005%2FhallCostumes%2F&initialURL=http%3A%2F%2Fwww.ask.com%2Fpictures%3Fimgc%3Dboth%26q%3Dpeople%2Bdress%2Bup%2Banime%26page%3D1%26o%3D15708%26l%3Ddir%26pstart%3D0%26qsrc%3D24&fm=i&ac=103&fsel=1&ftURI=http%3A%2F%2Fimages.ask.com%2Ffr%3Fq%3Dpeople%2Bdress%2Bup%2Banime%26desturi%3Dhttp%253A%252F%252Fgallery.geekitude.com%252Fv%252Fsf%252Flinucon2005%252FhallCostumes%252F%26imagesrc%3Dhttp%253A%252F%252Fgallery.geekitude.com%252Fd%252F471-3%252FCIMG0849PinkChocAnime.jpg%26thumbsrc%3Dhttp%</code>
+http://images.ask.com/fr?q=people dress up anime&desturi=http%3A%2F%2Fgallery.geekitude.com%2Fv%2Fsf%2Flinucon2005%2FhallCostumes%2F&initialURL=http%3A%2F%2Fwww.ask.com%2Fpictures%3Fimgc%3Dboth%26q%3Dpeople%2Bdress%2Bup%2Banime%26page%3D1%26o%3D15708%26l%3Ddir%26pstart%3D0%26qsrc%3D24&fm=i&ac=103&fsel=1&ftURI=http%3A%2F%2Fimages.ask.com%2Ffr%3Fq%3Dpeople%2Bdress%2Bup%2Banime%26desturi%3Dhttp%253A%252F%252Fgallery.geekitude.com%252Fv%252Fsf%252Flinucon2005%252FhallCostumes%252F%26imagesrc%3Dhttp%253A%252F%252Fgallery.geekitude.com%252Fd%252F471-3%252FCIMG0849PinkChocAnime.jpg%26thumbsrc%3Dhttp%
 
 would produce a "compactified" referrer string like this: 
 
-<code>... people dress up anime ... CIMG0849PinkChocAnime.jpg ...</code>
+... people dress up anime ... CIMG0849PinkChocAnime.jpg ...
 
 so I know what search terms brought a visitor to my site, and what picture those search terms lead to.
 
-Regexes that match search terms are described in <code>app.config</code> like this: 
+Regexes that match search terms are described in app.config like this: 
 
     <add key="search_term_regex.0" value="((q=|p=|ps=|searchfor=|search_term=|rw=).+)" />
     <add key="search_term_regex.1" value="((fps_PBCK_).+?)_" />
 
-Regexes that extract image names from referrer strings are described in <code>app.config</code> like this: 
+Regexes that extract image names from referrer strings are described in app.config like this: 
 
     <add key="image_extraction_regex.0" value="(?&lt;==).+(jpg|JPG|jpeg|JPEG|gif|GIF|png|PNG)" />
     <add key="image_extraction_regex.1" value="(?&lt;=url=|imagesrc=|desturi=).+" />
 
-The logic of applying search terms regexes and image extraction regexes is not exactly the same. First, we chop up the referrer string into <code>name=value&</code> substrings. Then we apply all the search terms regexes to those pairs, to extract all the possible search terms. Then we apply image extraction regexes. The first one looks for any string that starts with "=" and ends with jpg, JPG, etc (common image file extensions), because any such string is most likely a URL of an image. If we find at least one of those, we stop. If we don't, we apply the second image extraction regex, which looks for URLs that don't end in an image file name, but that might be a URL that hints at an image. This logic isn't perfect, but in practice it captures almost all the meaningful substrings.
+The logic of applying search terms regexes and image extraction regexes is not exactly the same. First, we chop up the referrer string into name=value& substrings. Then we apply all the search terms regexes to those pairs, to extract all the possible search terms. Then we apply image extraction regexes. The first one looks for any string that starts with "=" and ends with jpg, JPG, etc (common image file extensions), because any such string is most likely a URL of an image. If we find at least one of those, we stop. If we don't, we apply the second image extraction regex, which looks for URLs that don't end in an image file name, but that might be a URL that hints at an image. This logic isn't perfect, but in practice it captures almost all the meaningful substrings.
 
