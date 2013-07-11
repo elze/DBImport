@@ -39,17 +39,6 @@ namespace DBImportTest
             PluginManager.setCompactifierSegmentSize(compactifierSegmentSize);
         }
 
-        /******
-        [Test]
-        public void fileHeaderProviderGetHeaderShouldReturnColumnNames()
-        {
-            FileHeaderProvider fhp = new FileHeaderProvider("C:\\Users\\elze\\Documents\\Visual Studio 2010\\Projects\\DBImport\\DBImport\\TestHeader.csv");
-            string[] columnNames = fhp.getHeader();
-            string[] igColumnNames = { "id", "group_name", "group_label" };
-            Assert.AreEqual(igColumnNames, columnNames);
-        }
-         * *******/
-
         [Test]
         public void fileGridProviderGetGridShouldReturnValues()
         {
@@ -94,35 +83,7 @@ namespace DBImportTest
         [Test]
         public void compactifyReferringURLShouldReturnCompactString()
         {
-            //Console.WriteLine("compactifyReferringURLShouldReturnCompactString is being run");
-            string path = Directory.GetCurrentDirectory();
-            Console.WriteLine("compactifyReferringURLShouldReturnCompactString: CurrentDirectory = " + path);
-
-            /******
-            string strConnection =
-                ConfigurationManager.ConnectionStrings["DBImport.Properties.Settings.PageVisitsConnectionString"].
-                    ConnectionString;
-            Console.WriteLine("compactifyReferringURLShouldReturnCompactString: ConnectionString = " + strConnection);
-
-             * *****/
-
             setAppSettings();
-
-            /****
-            NameValueCollection appSettings;
-            try
-            {
-                appSettings = ConfigurationManager.AppSettings;
-                string[] keys = appSettings.AllKeys;
-                string[] searchTermRegexKeys = Array.FindAll(keys, k => k.Contains("search_term_regex"));
-                Console.WriteLine("compactifyReferringURLShouldReturnCompactString: appSettings.AllKeys length = " + appSettings.AllKeys.Length);
-                //Console.WriteLine("compactifyReferringURLShouldReturnCompactString: searchTermRegexKeys length = " + searchTermRegexKeys.Length);
-            }
-            catch (ConfigurationErrorsException e)
-            {
-                Console.WriteLine("Could not read AppSettings: {0}", e.ToString());
-            }
-            ****/
 
             string strToExtractFromPossiblyEncoded1url = "http://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=10&sqi=2&ved=0CGgQFjAJ&url=http%3A%2F%2Fgallery.geekitude.com%2Fv%2F2007%2F2007Cruise%2FmayanRuins%2FCIMG8257BeheadedPlayerBlood.jpg.html&ei=pCYtUIPrEsTS0QWQ14DADA&usg=AFQjCNFnK67IlOAOHjIjIIgLnEDnAIBr3Q&sig2=MytvKIxNnXiGfu9o7sGw_Q";
             string strCompact1url = PluginManager.compactifyReferringURL(strToExtractFromPossiblyEncoded1url);
@@ -144,7 +105,7 @@ namespace DBImportTest
         public void insertLineBreaksIntoURLShouldInsertLineBreaks()
         {
             setAppSettings();
-            //PluginManager.setCompactifierSegmentSize(25);
+
             Console.WriteLine("Starting insertLineBreaksIntoURLShouldInsertLineBreaks. Will insert breaks into CIMG8257BeheadedPlayerBlood ");
             string strToInsertBreaks1ImageNoBreaks = "... CIMG8257BeheadedPlayerBlood.jpg ...";
             string strCompact1url = PluginManager.insertLineBreaksIntoURL(strToInsertBreaks1ImageNoBreaks);
@@ -163,11 +124,6 @@ namespace DBImportTest
             Assert.AreEqual("http://pic.geekitude.com/v<br/>/sf/fencon2008/P1020428ExKlingonAutumnThemed.jpg.html", strWithBreaks4Slashes);
 
             Console.WriteLine("Finished insertLineBreaksIntoURLShouldInsertLineBreaks");
-            /*******
-            string strToExtractFromPossiblyEncoded4LinkedIn = "http://www.linkedin.com/profile/view?id=3744112&authType=OUT_OF_NETWORK&authToken=mvkv&locale=en_US&srchid=62bdf9f9-4ace-405a-b91a-f60a358bb11c-0&srchindex=55&srchtotal=275&goback=%2Efps_PBCK_%22ruby on rails%22_*1_*1_*1_*1_*1_*1_*2_*1_I_us_78746_100_false_6_R_*1_*51_*1_*51_true_CC%2CI%2CN%2CPC%2CED%2CL%2CFG%2CTE%2CFA%2CSE%2CP%2CCS%2CF%2CDR%2CG_*2_4_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2_*2&pvs=ps&trk=pp_profile_name_link";
-            string strCompact4LinkedIn = StringCompactifier.compactifyReferringURL(strToExtractFromPossiblyEncoded4LinkedIn);
-            Assert.AreEqual("... fps_PBCK_\"ruby on rails\" ...", strCompact4LinkedIn);
-            *******/
         }
     
     
