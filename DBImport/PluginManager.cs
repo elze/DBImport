@@ -136,7 +136,7 @@ namespace DBImport
                         if (match.Success)
                         {
                             strCompact += "... " + match.Groups[1].Value + " ";
-                       }
+                        }
                     }
                 }
             }
@@ -164,13 +164,7 @@ namespace DBImport
                     break;
             }
 
-            if (!string.IsNullOrEmpty(strCompact))
-                strCompact += "...";
-
-            if (!string.IsNullOrEmpty(strCompactImages))
-                strCompactImages += " ... ";
-
-                strCompact += strCompactImages;
+            strCompact += strCompactImages;
 
             if (string.IsNullOrEmpty(strCompact))
                 strCompact = strToExtractFrom;
